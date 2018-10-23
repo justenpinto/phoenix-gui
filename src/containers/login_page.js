@@ -1,18 +1,22 @@
 import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import { authenticateUser } from '../actions/index';
 
 class LoginPage extends Component {
+
   renderField(field) {
     const { meta : { touched, error } } = field;
     const className = `form-group login-input ${touched && error ? 'has-danger' : ''}`
+    const placeholder = `Enter ${field.input.name}`
     return (
       <div className={className}>
         <label>{field.label}: </label>
         <input
           className="form-control"
           type={field.type}
+          placeholder={placeholder}
           {...field.input}
         />
         <div className="text-help">
@@ -23,26 +27,22 @@ class LoginPage extends Component {
   }
 
   onSubmit(values) {
-    this.props.authenticateUser(values,
-      () => {
-        this.props.history.push('/pnlsummary');
-      },
-      () => {
-        this.props.history.push('/');
-      }
-    );
+    this.props.authenticateUser(values);
   }
 
   render() {
-    const { handleSubmit } = this.props
     const { authenticated } = this.props.user
+    if (authenticated) {
+      return <Redirect to='/pnlsummary'/>
+    }
     var error_message = '';
     if (authenticated == false) {
       error_message = this.props.user.error_message;
     }
+      const { handleSubmit } = this.props
     return (
-      <div>
-        <div className="login-label">
+      <div >
+        <div className="page-header">
           <h3>Login Page</h3>
         </div>
         <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
@@ -50,7 +50,9 @@ class LoginPage extends Component {
           <Field name="password" label="Password" type="password" component={this.renderField}/>
           <button type="submit" className="btn btn-primary">Login</button>
         </form>
-        {error_message}
+        <div className="login-error-msg text-danger">
+          {error_message}
+        </div>
       </div>
     );
   }

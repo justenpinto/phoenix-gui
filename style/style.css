@@ -1,8 +1,12 @@
-.login-label {
+.page-header {
   margin: 20px;
   text-align: center;
 }
 
 .login-input {
   width: 250px;
+}
+
+.login-error-msg {
+  margin: 20px;
 }

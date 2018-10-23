@@ -1,22 +1,35 @@
-import { AUTHENTICATE_USER } from '../actions/index';
+import {
+  AUTHENTICATE_USER,
+  FAILED_USER,
+  LOGOUT_USER,
+  LOGOUT_USER_ERROR
+} from '../actions/index';
 
 export default function (state = {authenticated: undefined}, action) {
   switch(action.type) {
     case AUTHENTICATE_USER:
-      console.log('Authentication payload: ', action);
-      // console.log(action.payload);
-      if (action.payload.status == 200) {
-        return  {
-          email: action.payload.data.user,
-          access_token: action.payload.data.accessToken,
-          refresh_token: action.payload.data.refreshToken,
-          authenticated: true
-        }
-      } else {
-        return {
-          error_message: action.payload.response.data.message,
-          authenticated: false
-        };
+      const { user, accessToken, refreshToken } = action.payload;
+      return  {
+        email: user,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        authenticated: true
+      };
+    case FAILED_USER:
+      return {
+        error_message: action.payload.response.data.message,
+        authenticated: false
+      };
+    case LOGOUT_USER:
+      return {
+        authenticated: undefined
+      }
+    case LOGOUT_USER_ERROR:
+      return {
+        email: state.email,
+        accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
+        authenticated: undefined
       }
     default:
       return state;
